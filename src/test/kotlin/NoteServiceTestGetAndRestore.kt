@@ -8,18 +8,19 @@ class NoteServiceTestGetAndRestore {
     @After
     fun clean() {
         NoteService.clean()
+        CommentsService.clean()
     }
 
     @Test
     fun getNotesReturnMutableList() {
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
                 text = "TextNote",
             )
         )
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 2,
                 title = "TitleNote2",
@@ -27,7 +28,7 @@ class NoteServiceTestGetAndRestore {
             )
         )
 
-        val actualResult = NoteService.getNotes()
+        val actualResult = NoteService.read()
         val expectedResult = mutableListOf(
             Notes(
                 id = 1,
@@ -41,65 +42,44 @@ class NoteServiceTestGetAndRestore {
             )
         )
 
-        var result = false
-        for (noteFirst in expectedResult) {
-            for (noteSecond in actualResult) {
-                result =
-                    noteFirst.id == noteSecond.id && noteFirst.title == noteSecond.title && noteFirst.text == noteSecond.text
-            }
-        }
+        assertEquals(expectedResult, actualResult)
 
-
-        assertTrue(result)
     }
 
     @Test
     fun getNotesWithDeleteStatusNote() {
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
                 text = "TextNote",
             )
         )
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 2,
                 title = "TitleNote2",
                 text = "TextNote2",
-                isDelete = false
+                isDelete = true
             )
         )
 
-        val actualResult = NoteService.getNotes()
+        val actualResult = NoteService.read()
         val expectedResult = mutableListOf(
             Notes(
                 id = 1,
                 title = "TitleNote",
                 text = "TextNote",
-            ),
-            Notes(
-                id = 2,
-                title = "TitleNote2",
-                text = "TextNote2",
             )
         )
 
-        var result = false
-        for (noteFirst in expectedResult) {
-            for (noteSecond in actualResult) {
-                result =
-                    noteFirst.id == noteSecond.id && noteFirst.title == noteSecond.title && noteFirst.text == noteSecond.text
-            }
-        }
+        assertEquals(expectedResult, actualResult)
 
-
-        assertFalse(result)
     }
 
     @Test
     fun getNoteByIdReturnNote() {
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
@@ -107,22 +87,19 @@ class NoteServiceTestGetAndRestore {
             )
         )
 
-        val actualResult = NoteService.getNoteById(1)
+        val actualResult = NoteService.getById(1)
         val expectedResult = Notes(
             id = 1,
             title = "TitleNote",
             text = "TextNote",
         )
+        assertEquals(expectedResult, actualResult)
 
-        val result: Boolean =
-            actualResult.id == expectedResult.id && actualResult.title == expectedResult.title && actualResult.text == expectedResult.text
-
-        assertTrue(result)
     }
 
     @Test(expected = NoteNotFoundException::class)
     fun getNoteByIdWithOtherIdNote() {
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
@@ -130,26 +107,26 @@ class NoteServiceTestGetAndRestore {
             )
         )
 
-        NoteService.getNoteById(2)
+        NoteService.getById(2)
     }
 
     @Test(expected = NoteNotFoundException::class)
     fun getNoteByIdWithDeleteStatusNote() {
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
                 text = "TextNote",
-                isDelete = false
+                isDelete = true
             )
         )
 
-        NoteService.getNoteById(1)
+        NoteService.getById(1)
     }
 
     @Test
     fun getComments() {
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
@@ -157,14 +134,14 @@ class NoteServiceTestGetAndRestore {
             )
         )
 
-        NoteService.createComment(
+        CommentsService.add(
             Comments(
                 idNotes = 1,
                 id = 1,
                 text = "TextComment"
             )
         )
-        NoteService.createComment(
+        CommentsService.add(
             Comments(
                 idNotes = 1,
                 id = 2,
@@ -172,7 +149,7 @@ class NoteServiceTestGetAndRestore {
             )
         )
 
-        val actualResult = NoteService.getComments(1)
+        val actualResult = CommentsService.getByIdNote(1)
         val expectedResult = mutableListOf(
             Comments(
                 idNotes = 1,
@@ -185,21 +162,13 @@ class NoteServiceTestGetAndRestore {
             )
         )
 
-        var result = false
-        for (noteFirst in expectedResult) {
-            for (noteSecond in actualResult) {
-                result =
-                    noteFirst.id == noteSecond.id && noteFirst.text == noteSecond.text && noteFirst.idNotes == noteSecond.idNotes
-            }
-        }
-
-        assertTrue(result)
+        assertEquals(expectedResult, actualResult)
 
     }
 
     @Test(expected = NoteNotFoundException::class)
     fun getCommentsIsFalseWithOtherIdNote() {
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
@@ -207,14 +176,14 @@ class NoteServiceTestGetAndRestore {
             )
         )
 
-        NoteService.createComment(
+        CommentsService.add(
             Comments(
                 idNotes = 1,
                 id = 1,
                 text = "TextComment"
             )
         )
-        NoteService.createComment(
+        CommentsService.add(
             Comments(
                 idNotes = 1,
                 id = 2,
@@ -222,30 +191,30 @@ class NoteServiceTestGetAndRestore {
             )
         )
 
-        NoteService.getComments(6)
+        CommentsService.getByIdNote(6)
 
 
     }
 
     @Test(expected = NoteNotFoundException::class)
     fun getCommentsIsFalseWithDeleteStatusNote() {
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
                 text = "TextNote",
-                isDelete = false
+                isDelete = true
             )
         )
 
-        NoteService.createComment(
+        CommentsService.add(
             Comments(
                 idNotes = 1,
                 id = 1,
                 text = "TextComment"
             )
         )
-        NoteService.createComment(
+        CommentsService.add(
             Comments(
                 idNotes = 1,
                 id = 2,
@@ -253,13 +222,13 @@ class NoteServiceTestGetAndRestore {
             )
         )
 
-        NoteService.getComments(1)
+        CommentsService.getByIdNote(1)
 
     }
 
     @Test
     fun getCommentsIsTrueWithDeleteStatusComment() {
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
@@ -267,14 +236,15 @@ class NoteServiceTestGetAndRestore {
             )
         )
 
-        NoteService.createComment(
+        CommentsService.add(
             Comments(
                 idNotes = 1,
                 id = 1,
                 text = "TextComment",
+                isDelete = true
             )
         )
-        NoteService.createComment(
+        CommentsService.add(
             Comments(
                 idNotes = 1,
                 id = 2,
@@ -283,30 +253,23 @@ class NoteServiceTestGetAndRestore {
             )
         )
 
-        val actualResult = NoteService.getComments(1)
+        val actualResult = CommentsService.getByIdNote(1)
         val expectedResult = mutableListOf(
             Comments(
                 idNotes = 1,
-                id = 1,
-                text = "TextComment"
+                id = 2,
+                text = "TextComment2",
             )
         )
 
-        var result = true
-        for (noteFirst in expectedResult) {
-            for (noteSecond in actualResult) {
-                result =
-                    noteFirst.id == noteSecond.id && noteFirst.text == noteSecond.text && noteFirst.idNotes == noteSecond.idNotes
-            }
-        }
 
-        assertTrue(result)
+        assertEquals(expectedResult, actualResult)
 
     }
 
     @Test
-    fun restoreCommentIsTrue() {
-        NoteService.addNote(
+    fun getCommentIsTrueByIdComment() {
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
@@ -314,29 +277,217 @@ class NoteServiceTestGetAndRestore {
             )
         )
 
-        NoteService.createComment(
+        NoteService.add(
+            Notes(
+                id = 2,
+                title = "TitleNote2",
+                text = "TextNote",
+                isDelete = true
+            )
+        )
+
+        CommentsService.add(
             Comments(
                 idNotes = 1,
                 id = 1,
-                text = "TextComment"
+                text = "TextComment",
+                isDelete = true
             )
         )
-        NoteService.createComment(
+        CommentsService.add(
+            Comments(
+                idNotes = 1,
+                id = 2,
+                text = "TextComment2",
+            )
+        )
+        CommentsService.add(
+            Comments(
+                idNotes = 1,
+                id = 3,
+                text = "TextComment3",
+            )
+        )
+
+        val actualResult = CommentsService.getById(3)
+        val expectedResult =
+            Comments(
+                idNotes = 1,
+                id = 3,
+                text = "TextComment3",
+            )
+
+
+        assertEquals(expectedResult, actualResult)
+
+    }
+
+
+    @Test(expected = CommentNotFoundException::class)
+    fun getCommentIsFalseByIdComment() {
+        NoteService.add(
+            Notes(
+                id = 1,
+                title = "TitleNote",
+                text = "TextNote",
+            )
+        )
+
+        NoteService.add(
+            Notes(
+                id = 2,
+                title = "TitleNote2",
+                text = "TextNote",
+                isDelete = true
+            )
+        )
+
+        CommentsService.add(
+            Comments(
+                idNotes = 1,
+                id = 1,
+                text = "TextComment",
+                isDelete = true
+            )
+        )
+        CommentsService.add(
+            Comments(
+                idNotes = 1,
+                id = 2,
+                text = "TextComment2",
+            )
+        )
+        CommentsService.add(
+            Comments(
+                idNotes = 1,
+                id = 3,
+                text = "TextComment2",
+            )
+        )
+
+        CommentsService.getById(4)
+    }
+
+    @Test(expected = CommentNotFoundException::class)
+    fun getCommentIsFalseByStatusComment() {
+        NoteService.add(
+            Notes(
+                id = 1,
+                title = "TitleNote",
+                text = "TextNote",
+            )
+        )
+
+        NoteService.add(
+            Notes(
+                id = 2,
+                title = "TitleNote2",
+                text = "TextNote",
+                isDelete = true
+            )
+        )
+
+        CommentsService.add(
+            Comments(
+                idNotes = 1,
+                id = 1,
+                text = "TextComment",
+                isDelete = true
+            )
+        )
+        CommentsService.add(
+            Comments(
+                idNotes = 1,
+                id = 2,
+                text = "TextComment2",
+            )
+        )
+
+        CommentsService.getById(1)
+    }
+
+    @Test
+    fun getAllComments() {
+        NoteService.add(
+            Notes(
+                id = 1,
+                title = "TitleNote",
+                text = "TextNote",
+            )
+        )
+
+        NoteService.add(
+            Notes(
+                id = 2,
+                title = "TitleNote2",
+                text = "TextNote",
+                isDelete = true
+            )
+        )
+
+        CommentsService.add(
+            Comments(
+                idNotes = 1,
+                id = 1,
+                text = "TextComment",
+                isDelete = true
+            )
+        )
+        CommentsService.add(
+            Comments(
+                idNotes = 1,
+                id = 2,
+                text = "TextComment2",
+            )
+        )
+
+        val actualResult = CommentsService.read()
+        val expectedResult = mutableListOf(
             Comments(
                 idNotes = 1,
                 id = 2,
                 text = "TextComment2"
             )
         )
-        NoteService.deleteComment(2)
-        val result = NoteService.restoreComment(2)
+
+
+        assertEquals(expectedResult, actualResult)
+
+    }
+
+    @Test
+    fun restoreCommentIsTrue() {
+        NoteService.add(
+            Notes(
+                id = 1,
+                title = "TitleNote",
+                text = "TextNote",
+            )
+        )
+
+        CommentsService.add(
+            Comments(
+                idNotes = 1,
+                id = 1,
+                text = "TextComment"
+            )
+        )
+        CommentsService.add(
+            Comments(
+                idNotes = 1,
+                id = 2,
+                text = "TextComment2"
+            )
+        )
+        CommentsService.delete(2)
+        val result = CommentsService.restore(2)
 
         assertTrue(result)
     }
 
     @Test
     fun restoreCommentIsFalseWithOtherIdComment() {
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
@@ -344,29 +495,29 @@ class NoteServiceTestGetAndRestore {
             )
         )
 
-        NoteService.createComment(
+        CommentsService.add(
             Comments(
                 idNotes = 1,
                 id = 1,
                 text = "TextComment"
             )
         )
-        NoteService.createComment(
+        CommentsService.add(
             Comments(
                 idNotes = 1,
                 id = 2,
                 text = "TextComment2"
             )
         )
-        NoteService.deleteComment(1)
-        val result = NoteService.restoreComment(3)
+        CommentsService.delete(1)
+        val result = CommentsService.restore(3)
 
         assertFalse(result)
     }
 
     @Test
     fun restoreCommentIsFalseWithNoDeleteStatusComment() {
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
@@ -374,14 +525,14 @@ class NoteServiceTestGetAndRestore {
             )
         )
 
-        NoteService.createComment(
+        CommentsService.add(
             Comments(
                 idNotes = 1,
                 id = 1,
                 text = "TextComment"
             )
         )
-        NoteService.createComment(
+        CommentsService.add(
             Comments(
                 idNotes = 1,
                 id = 2,
@@ -389,8 +540,54 @@ class NoteServiceTestGetAndRestore {
             )
         )
 
-        val result = NoteService.restoreComment(2)
+        val result = CommentsService.restore(2)
 
         assertFalse(result)
     }
+
+    @Test
+    fun restoreNoteIsTrue() {
+        NoteService.add(
+            Notes(
+                id = 1,
+                title = "TitleNote",
+                text = "TextNote",
+                isDelete = true
+            )
+        )
+
+        val result = NoteService.restore(1)
+        assertTrue(result)
+    }
+
+    @Test
+    fun restoreNoteIsFalseWithOtherId() {
+        NoteService.add(
+            Notes(
+                id = 1,
+                title = "TitleNote",
+                text = "TextNote",
+                isDelete = true
+            )
+        )
+
+        val result = NoteService.restore(2)
+        assertFalse(result)
+    }
+
+    @Test
+    fun restoreNoteIsFalse() {
+        NoteService.add(
+            Notes(
+                id = 1,
+                title = "TitleNote",
+                text = "TextNote",
+                isDelete = false
+            )
+        )
+
+        val result = NoteService.restore(1)
+        assertFalse(result)
+    }
+
 }

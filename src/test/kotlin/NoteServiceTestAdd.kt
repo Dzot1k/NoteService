@@ -8,11 +8,12 @@ class NoteServiceTestAdd {
     @After
     fun clean() {
         NoteService.clean()
+        CommentsService.clean()
     }
 
     @Test
     fun addNote() {
-        val resultNote = NoteService.addNote(
+        val resultNote = NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
@@ -24,7 +25,7 @@ class NoteServiceTestAdd {
 
     @Test
     fun createCommentIsTrue() {
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
@@ -32,7 +33,7 @@ class NoteServiceTestAdd {
             )
         )
 
-        val resultComment = NoteService.createComment(
+        val resultComment = CommentsService.add(
             Comments(
                 idNotes = 1,
                 id = 1,
@@ -45,7 +46,7 @@ class NoteServiceTestAdd {
 
     @Test(expected = NoteNotFoundException::class)
     fun createCommentIsFalse() {
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
@@ -53,7 +54,7 @@ class NoteServiceTestAdd {
             )
         )
 
-        NoteService.createComment(
+        CommentsService.add(
             Comments(
                 idNotes = 5,
                 id = 1,

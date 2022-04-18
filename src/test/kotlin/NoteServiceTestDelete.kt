@@ -8,51 +8,52 @@ class NoteServiceTestDelete {
     @After
     fun clean() {
         NoteService.clean()
+        CommentsService.clean()
     }
 
     @Test
     fun deleteNoteIsTrue() {
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
                 text = "TextNote",
             )
         )
-        val resultDelete = NoteService.deleteNote(1)
+        val resultDelete = NoteService.delete(1)
         assertTrue(resultDelete)
     }
 
     @Test(expected = NoteNotFoundException::class)
     fun deleteNoteIsFalseWithOtherIdNote() {
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
                 text = "TextNote",
             )
         )
-        NoteService.deleteNote(2)
+        NoteService.delete(2)
 
     }
 
     @Test(expected = NoteNotFoundException::class)
     fun deleteNoteIsFalseWithDeleteStatusNote() {
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
                 text = "TextNote",
-                isDelete = false
+                isDelete = true
             )
         )
-        NoteService.deleteNote(1)
+        NoteService.delete(1)
 
     }
 
     @Test
     fun deleteCommentIsTrue() {
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
@@ -68,13 +69,13 @@ class NoteServiceTestDelete {
 
             )
         )
-        val resultComment = NoteService.deleteComment(1)
-            assertTrue(resultComment)
+        val resultComment = CommentsService.delete(1)
+        assertTrue(resultComment)
     }
 
     @Test(expected = CommentNotFoundException::class)
     fun deleteCommentIsFalseWithOtherIdComm() {
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
@@ -90,13 +91,13 @@ class NoteServiceTestDelete {
 
             )
         )
-        NoteService.deleteComment(2)
+        CommentsService.delete(2)
 
     }
 
     @Test(expected = CommentNotFoundException::class)
     fun deleteCommentIsFalseWithDeleteStatusComm() {
-        NoteService.addNote(
+        NoteService.add(
             Notes(
                 id = 1,
                 title = "TitleNote",
@@ -109,11 +110,11 @@ class NoteServiceTestDelete {
                 idNotes = 1,
                 id = 1,
                 text = "TextComment",
-                isDelete = false
+                isDelete = true
 
             )
         )
-        NoteService.deleteComment(1)
+        CommentsService.delete(1)
 
     }
 
